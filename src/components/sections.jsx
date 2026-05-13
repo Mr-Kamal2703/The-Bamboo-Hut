@@ -55,7 +55,7 @@ export function Header() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-40 border-b border-white/8 bg-black/35 backdrop-blur-2xl">
-      <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8 2xl:max-w-[88rem] 2xl:px-10">
         <a href="#home" className="group flex items-center gap-3">
           <span className="flex h-11 w-11 items-center justify-center rounded-full border border-gold/30 bg-white/5 text-gold shadow-glow">
             <BambooLogoMark />
@@ -92,7 +92,7 @@ export function Header() {
         </div>
 
         <button
-          className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-warm lg:hidden"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-warm touch-manipulation lg:hidden"
           onClick={() => setOpen((value) => !value)}
           aria-label="Toggle navigation"
         >
@@ -106,7 +106,7 @@ export function Header() {
             initial={{ opacity: 0, y: -16 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -16 }}
-            className="border-t border-white/10 bg-black/90 px-4 py-5 lg:hidden"
+            className="max-h-[calc(100vh-4.5rem)] overflow-y-auto border-t border-white/10 bg-black/90 px-4 py-5 lg:hidden"
           >
             <div className="mx-auto flex max-w-7xl flex-col gap-4">
               {links.map((link) => (
@@ -114,7 +114,7 @@ export function Header() {
                   key={link}
                   href={`#${link.toLowerCase()}`}
                   onClick={() => setOpen(false)}
-                  className="rounded-2xl border border-white/8 bg-white/5 px-4 py-3 text-sm text-warm"
+                  className="flex min-h-11 items-center rounded-2xl border border-white/8 bg-white/5 px-4 py-3 text-sm text-warm touch-manipulation"
                 >
                   {link}
                 </a>
@@ -127,28 +127,38 @@ export function Header() {
   );
 }
 
-export function HeroSection() {
+export function HeroSection({ reduceMotion = false }) {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
+    if (reduceMotion) {
+      return undefined;
+    }
+
     const timer = setInterval(() => {
       setIndex((value) => (value + 1) % heroSlides.length);
     }, 5200);
     return () => clearInterval(timer);
-  }, []);
+  }, [reduceMotion]);
+
+  const slidesToRender = reduceMotion ? [heroSlides[0]] : heroSlides;
 
   return (
     <section id="home" className="relative min-h-screen overflow-hidden">
       <div className="absolute inset-0">
-        {heroSlides.map((slide, slideIndex) => (
+        {slidesToRender.map((slide, slideIndex) => (
           <motion.div
             key={slide.image}
-            initial={false}
-            animate={{
-              opacity: slideIndex === index ? 1 : 0,
-              scale: slideIndex === index ? 1.08 : 1.16,
-            }}
-            transition={{ duration: 1.5, ease: "easeOut" }}
+            initial={reduceMotion ? false : { opacity: 0 }}
+            animate={
+              reduceMotion
+                ? { opacity: 1, scale: 1 }
+                : {
+                    opacity: slideIndex === index ? 1 : 0,
+                    scale: slideIndex === index ? 1.08 : 1.16,
+                  }
+            }
+            transition={reduceMotion ? { duration: 0 } : { duration: 1.5, ease: "easeOut" }}
             className="absolute inset-0"
           >
             <img src={slide.image} alt={slide.alt} className="h-full w-full object-cover" loading="eager" />
@@ -156,7 +166,8 @@ export function HeroSection() {
         ))}
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,15,15,0.2)_0%,rgba(15,15,15,0.84)_75%,rgba(15,15,15,1)_100%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(212,175,55,0.22),transparent_36%)]" />
-        <div className="absolute inset-0 overflow-hidden">
+        {!reduceMotion ? (
+          <div className="absolute inset-0 overflow-hidden">
           {[
             ["left-[12%] top-[24%]", "h-2 w-2"],
             ["left-[20%] top-[66%]", "h-1.5 w-1.5"],
@@ -171,15 +182,16 @@ export function HeroSection() {
               style={{ animationDelay: `${index * 0.7}s` }}
             />
           ))}
-        </div>
+          </div>
+        ) : null}
       </div>
 
-      <div className="relative mx-auto flex min-h-screen w-full max-w-7xl flex-col justify-end px-4 pb-24 pt-28 sm:px-6 lg:px-8 lg:pb-28">
+      <div className="relative mx-auto flex min-h-screen w-full max-w-7xl flex-col justify-end px-4 pb-20 pt-24 sm:px-6 lg:px-8 lg:pb-28 lg:pt-28 2xl:max-w-[88rem] 2xl:px-10">
         <motion.div
           variants={sectionReveal}
           initial="hidden"
           animate="show"
-          className="grid items-end gap-10 lg:grid-cols-[1.15fr_0.85fr]"
+          className="grid items-end gap-8 lg:grid-cols-[1.15fr_0.85fr] xl:gap-10 2xl:gap-14"
         >
           <div className="max-w-4xl">
             <Badge>Premium Indian dining</Badge>
@@ -187,7 +199,7 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.12 }}
-              className="mt-6 font-heading text-5xl leading-tight text-warm sm:text-6xl lg:text-8xl"
+              className="mt-5 max-w-3xl font-heading text-2xl leading-tight text-warm sm:text-5xl lg:text-7xl xl:text-8xl 2xl:max-w-4xl"
             >
               Taste Luxury
               <span className="block bg-gradient-to-r from-gold via-[#ffe08b] to-copper bg-[length:200%_200%] bg-clip-text text-transparent animate-shimmer">
@@ -198,7 +210,7 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.28 }}
-              className="mt-6 max-w-2xl text-lg leading-8 text-white/72 sm:text-xl"
+              className="mt-5 max-w-2xl text-base leading-7 text-white/72 sm:mt-6 sm:text-xl sm:leading-8"
             >
               Experience unforgettable dining with rich flavors, elegant ambiance, premium hospitality, and a smooth
               reservation flow built for modern food lovers.
@@ -208,7 +220,7 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.4 }}
-              className="mt-8 flex flex-wrap gap-4"
+              className="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap sm:gap-4"
             >
               <GlassButton href="#reservations">Book Table</GlassButton>
               <GlassButton href="#ordering" variant="ghost">
@@ -219,7 +231,7 @@ export function HeroSection() {
               </GlassButton>
             </motion.div>
 
-            <div className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="mt-8 grid gap-4 sm:mt-10 sm:grid-cols-2 xl:grid-cols-4">
               {stats.map((stat) => (
                 <StatTile key={stat.label} {...stat} />
               ))}
@@ -234,7 +246,7 @@ export function HeroSection() {
           >
             <div className="absolute -left-10 top-10 h-28 w-28 rounded-full bg-gold/20 blur-3xl" />
             <div className="absolute -right-6 bottom-6 h-36 w-36 rounded-full bg-copper/15 blur-3xl" />
-            <div className="relative overflow-hidden rounded-[32px] border border-white/10 bg-white/5 p-4 backdrop-blur-2xl">
+            <div className="relative mx-auto overflow-hidden rounded-[32px] border border-white/10 bg-white/5 p-2 shadow-soft backdrop-blur-2xl sm:p-4 sm:max-w-[540px] lg:max-w-none 2xl:max-w-[680px]">
               <div className="aspect-[4/5] overflow-hidden rounded-[24px]">
                 <img
                   src={heroSlides[index].image}
@@ -242,12 +254,12 @@ export function HeroSection() {
                   className="h-full w-full object-cover transition duration-1000 hover:scale-110"
                 />
               </div>
-              <div className="mt-4 flex items-center justify-between gap-4">
+              <div className="mt-3 flex items-center justify-between gap-3 sm:mt-4 sm:gap-4">
                 <div>
                   <div className="text-[11px] uppercase tracking-[0.34em] text-gold/80">Tonight's experience</div>
-                  <div className="mt-1 font-heading text-2xl text-warm">Cinematic dining, softly lit</div>
+                  <div className="mt-1 font-heading text-lg text-warm sm:text-2xl">Cinematic dining, softly lit</div>
                 </div>
-                <div className="rounded-full border border-gold/25 bg-gold/10 px-4 py-2 text-sm text-gold">
+                <div className="rounded-full border border-gold/25 bg-gold/10 px-3 py-2 text-xs text-gold sm:px-4 sm:text-sm">
                   100% premium
                 </div>
               </div>
@@ -268,11 +280,11 @@ export function AboutSection() {
         description="Inspired by premium hospitality, the dining flow balances modern elegance with Indian warmth. Every detail is designed to feel refined, intimate, and easy to love."
       />
 
-      <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+      <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] 2xl:gap-12">
         <motion.div variants={sectionReveal} initial="hidden" whileInView="show" viewport={{ once: true }}>
           <Card className="!p-0">
             <div className="grid gap-0 lg:grid-cols-[0.95fr_1.05fr]">
-              <div className="relative min-h-[340px]">
+              <div className="relative min-h-[260px] sm:min-h-[340px]">
                 <img
                   src="https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?auto=format&fit=crop&w=1200&q=80"
                   alt="Elegant fine dining atmosphere"
@@ -282,7 +294,7 @@ export function AboutSection() {
               </div>
               <div className="p-6 sm:p-8">
                 <Badge>Chef-led hospitality</Badge>
-                <h3 className="mt-5 font-heading text-3xl text-warm">Crafted for evenings that linger.</h3>
+                <h3 className="mt-5 font-heading text-2xl text-warm sm:text-3xl">Crafted for evenings that linger.</h3>
                 <p className="mt-4 text-base leading-8 text-white/68">
                   From the first warm welcome to the final bite, the experience is shaped around generous service,
                   premium ingredients, and a dining room that feels both intimate and celebratory.
@@ -358,7 +370,7 @@ export function SignatureDishesSection() {
               </div>
               <div className="p-5">
                 <div className="flex items-center justify-between gap-4">
-                  <h3 className="font-heading text-2xl text-warm">{dish.name}</h3>
+                  <h3 className="font-heading text-xl text-warm sm:text-2xl">{dish.name}</h3>
                   <span className="text-xl font-semibold text-gold">{dish.price}</span>
                 </div>
                 <p className="mt-3 min-h-16 text-sm leading-7 text-white/68">{dish.description}</p>
@@ -391,7 +403,7 @@ export function MenuSection() {
         description="Switch categories with a smooth animated interface built for both desktop browsing and touch-first mobile interactions."
       />
 
-      <div className="mb-8 grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
+      <div className="mb-8 grid gap-6 lg:grid-cols-[1.08fr_0.92fr] 2xl:gap-10">
         <Card className="!p-0 overflow-hidden">
           <div className="relative min-h-[320px]">
             <img
@@ -407,7 +419,7 @@ export function MenuSection() {
             <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,15,15,0.08),rgba(15,15,15,0.86))]" />
             <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
               <Badge>{active}</Badge>
-              <h3 className="mt-4 max-w-xl font-heading text-3xl text-warm sm:text-4xl">{showcase.title}</h3>
+              <h3 className="mt-4 max-w-xl font-heading text-2xl text-warm sm:text-4xl">{showcase.title}</h3>
               <p className="mt-3 max-w-2xl text-sm leading-7 text-white/70 sm:text-base">{showcase.description}</p>
             </div>
           </div>
@@ -416,7 +428,7 @@ export function MenuSection() {
         <div className="grid gap-4">
           <Card>
             <div className="text-sm uppercase tracking-[0.3em] text-gold/75">Category vibe</div>
-            <div className="mt-3 font-heading text-3xl text-warm">{active}</div>
+            <div className="mt-3 font-heading text-2xl text-warm">{active}</div>
             <p className="mt-3 text-sm leading-7 text-white/65">
               A visual-first menu lane that helps guests scan the style of the section before they open a dish.
             </p>
@@ -433,12 +445,12 @@ export function MenuSection() {
         </div>
       </div>
 
-      <div className="mb-8 flex gap-3 overflow-x-auto pb-2">
+      <div className="mb-8 flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
         {tabs.map((tab) => (
           <button
             key={tab}
             onClick={() => setActive(tab)}
-            className={`whitespace-nowrap rounded-full px-5 py-3 text-sm font-semibold transition ${
+            className={`min-h-11 whitespace-nowrap rounded-full px-5 py-3 text-sm font-semibold transition touch-manipulation ${
               active === tab
                 ? "bg-gradient-to-r from-gold to-copper text-black shadow-glow"
                 : "border border-white/10 bg-white/5 text-white/70 hover:border-gold/40 hover:text-gold"
@@ -456,7 +468,7 @@ export function MenuSection() {
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           exit={{ opacity: 0, y: -20, filter: "blur(10px)" }}
           transition={{ duration: 0.45 }}
-          className="grid gap-5 lg:grid-cols-3"
+          className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
         >
           {items.map((item) => (
             <Card key={item.name}>
@@ -490,8 +502,8 @@ export function ReservationSection() {
         description="A dark glassmorphism form, premium inputs, and a clear split between standard seating and party requests."
       />
 
-      <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-        <Card className="p-6 sm:p-8">
+      <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] 2xl:gap-12">
+        <Card className="p-4 sm:p-8">
           <form className="grid gap-4">
             {[
               ["Name", "text", "Your name"],
@@ -532,7 +544,7 @@ export function ReservationSection() {
           </form>
         </Card>
 
-        <div className="grid gap-5 sm:grid-cols-2">
+        <div className="grid gap-4 sm:gap-5 sm:grid-cols-2">
           {[
             {
               title: "Birthday styling",
@@ -551,13 +563,13 @@ export function ReservationSection() {
               text: "A premium experience from booking confirmation to final service.",
             },
           ].map((item) => (
-            <Card key={item.title}>
+            <Card key={item.title} className="p-4 sm:p-5">
               <div className="flex items-center gap-3">
-                <span className="flex h-11 w-11 items-center justify-center rounded-full border border-gold/20 bg-gold/10 text-gold">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full border border-gold/20 bg-gold/10 text-gold sm:h-11 sm:w-11">
                   <FaRegClock />
                 </span>
                 <div>
-                  <div className="text-lg font-semibold text-warm">{item.title}</div>
+                  <div className="text-base font-semibold text-warm sm:text-lg">{item.title}</div>
                   <p className="mt-1 text-sm leading-7 text-white/65">{item.text}</p>
                 </div>
               </div>
@@ -578,14 +590,14 @@ export function ExperienceSection() {
         description="A split-screen layout keeps the premium story visual while the supporting text stays crisp and easy to scan."
       />
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:gap-8">
         {experienceCards.map((card) => (
           <Card key={card.title} className="!p-0">
             <div className="relative h-72">
               <img src={card.image} alt={card.title} className="h-full w-full object-cover" loading="lazy" />
               <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent,rgba(15,15,15,0.85))]" />
               <div className="absolute inset-x-0 bottom-0 p-5">
-                <h3 className="font-heading text-3xl text-warm">{card.title}</h3>
+                <h3 className="font-heading text-2xl text-warm sm:text-3xl">{card.title}</h3>
                 <p className="mt-2 text-sm leading-7 text-white/70">{card.text}</p>
               </div>
             </div>
@@ -612,11 +624,11 @@ export function TestimonialsSection() {
         description="The reviews slide automatically in a calm, premium rhythm so the social proof feels lively without distracting from the design."
       />
 
-      <div className="grid gap-6 lg:grid-cols-[0.88fr_1.12fr]">
-        <Card className="flex min-h-[300px] flex-col justify-between">
+      <div className="grid gap-6 lg:grid-cols-[0.88fr_1.12fr] 2xl:gap-10">
+        <Card className="flex min-h-[260px] flex-col justify-between sm:min-h-[300px]">
           <div>
             <Badge>4.9 average rating</Badge>
-            <h3 className="mt-5 font-heading text-3xl text-warm">Loved by families, birthday groups, and regular diners.</h3>
+            <h3 className="mt-5 font-heading text-2xl text-warm sm:text-3xl">Loved by families, birthday groups, and regular diners.</h3>
           </div>
           <div className="mt-6 flex items-center gap-3">
             <div className="flex -space-x-3">
@@ -636,7 +648,7 @@ export function TestimonialsSection() {
           </div>
         </Card>
 
-        <div className="relative min-h-[300px]">
+        <div className="relative min-h-[260px] sm:min-h-[300px]">
           <AnimatePresence mode="wait">
             <motion.div
               key={index}
@@ -649,12 +661,12 @@ export function TestimonialsSection() {
               <Card className="h-full">
                 <div className="flex items-center justify-between">
                   <div>
-                    <div className="font-heading text-2xl text-warm">{testimonials[index].name}</div>
+                    <div className="font-heading text-xl text-warm sm:text-2xl">{testimonials[index].name}</div>
                     <div className="mt-1 text-sm text-white/50">{testimonials[index].role}</div>
                   </div>
                   <Rating value={testimonials[index].rating} />
                 </div>
-                <p className="mt-8 text-2xl leading-[1.75] text-white/82 sm:text-3xl">
+                <p className="mt-8 text-xl leading-[1.7] text-white/82 sm:text-3xl">
                   “{testimonials[index].quote}”
                 </p>
               </Card>
@@ -677,12 +689,12 @@ export function GallerySection() {
         description="The masonry-like flow mixes wide and narrow cards, with an elegant lightbox-style preview on click."
       />
 
-      <div className="columns-1 gap-5 space-y-5 md:columns-2 xl:columns-3">
+      <div className="columns-1 gap-5 space-y-5 sm:columns-2 xl:columns-3">
         {galleryImages.map((item, index) => (
           <button
             key={item.label}
             onClick={() => setActiveImage(item)}
-            className={`group relative block w-full overflow-hidden rounded-[28px] border border-white/10 bg-white/5 text-left ${index % 3 === 0 ? "aspect-[4/5]" : "aspect-[5/4]"}`}
+            className={`group relative block w-full break-inside-avoid overflow-hidden rounded-[28px] border border-white/10 bg-white/5 text-left touch-manipulation ${index % 3 === 0 ? "aspect-[4/5]" : "aspect-[5/4]"}`}
           >
             <img
               src={item.image}
@@ -714,7 +726,7 @@ export function GallerySection() {
               className="max-w-4xl overflow-hidden rounded-[28px] border border-white/10 bg-blacklux shadow-soft"
               onClick={(event) => event.stopPropagation()}
             >
-              <img src={activeImage.image} alt={activeImage.label} className="h-[70vh] w-full object-cover" />
+              <img src={activeImage.image} alt={activeImage.label} className="h-[55vh] w-full object-cover sm:h-[70vh]" />
               <div className="flex items-center justify-between gap-4 p-5">
                 <div className="text-lg text-warm">{activeImage.label}</div>
                 <button onClick={() => setActiveImage(null)} className="text-sm text-gold">
@@ -738,8 +750,8 @@ export function OrderingSection() {
         description="Popular combos and a fast-order CTA keep the pathway focused on conversion, delivery, and ease of use."
       />
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
-        <div className="grid gap-5 md:grid-cols-3">
+      <div className="grid gap-6 lg:grid-cols-[1fr_0.9fr] 2xl:gap-10">
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {combos.map((combo) => (
             <Card key={combo.title}>
               <div className="text-sm uppercase tracking-[0.28em] text-gold/80">Popular combo</div>
@@ -756,22 +768,22 @@ export function OrderingSection() {
         </div>
 
         <Card className="overflow-hidden !p-0">
-          <div className="relative min-h-[380px] p-6 sm:p-8">
+          <div className="relative min-h-[300px] p-4 md:min-h-[360px] sm:min-h-[380px] sm:p-8">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(212,175,55,0.18),transparent_40%),linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.01))]" />
             <div className="relative">
               <Badge>Fast checkout</Badge>
-              <h3 className="mt-5 font-heading text-4xl text-warm">Order your favorites with a luxury touch.</h3>
+              <h3 className="mt-4 max-w-xl font-heading text-2xl text-warm sm:mt-5 sm:text-4xl">Order your favorites with a luxury touch.</h3>
               <p className="mt-4 max-w-xl text-base leading-8 text-white/68">
                 Designed for mobile-first speed, the ordering area highlights a direct path to add items, view the full
                 menu, and contact the restaurant instantly.
               </p>
-              <div className="mt-8 flex flex-wrap gap-4">
+              <div className="mt-6 flex flex-wrap gap-3 sm:mt-8 sm:gap-4">
                 <GlassButton>Order Now</GlassButton>
                 <GlassButton href="#menu" variant="ghost">
                   View Full Menu
                 </GlassButton>
               </div>
-              <div className="mt-8 flex items-center gap-4 text-sm text-white/60">
+              <div className="mt-6 flex items-center gap-4 text-sm text-white/60 sm:mt-8">
                 <span className="flex h-12 w-12 items-center justify-center rounded-full border border-gold/20 bg-gold/10 text-gold">
                   <GiHotMeal />
                 </span>
@@ -797,8 +809,8 @@ export function ContactSection() {
         description="The contact area stays minimal and elegant, with the essentials presented clearly and a map for easy discovery."
       />
 
-      <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
-        <Card className="p-6 sm:p-8">
+      <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr] 2xl:gap-12">
+        <Card className="p-5 sm:p-8">
           <div className="grid gap-4">
             {[
               { icon: FaPhone, title: brand.phone, text: "Call for reservations or party bookings" },
@@ -818,13 +830,13 @@ export function ContactSection() {
           </div>
 
           <div className="mt-6 flex gap-3">
-            <a className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-warm" href="#">
+            <a className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-warm touch-manipulation" href="#">
               <FaInstagram />
             </a>
-            <a className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-warm" href="#">
+            <a className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-warm touch-manipulation" href="#">
               <FaFacebookF />
             </a>
-            <a className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-warm" href="#">
+            <a className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-warm touch-manipulation" href="#">
               <FaXTwitter />
             </a>
           </div>
@@ -832,7 +844,7 @@ export function ContactSection() {
 
         <div className="grid gap-6">
           <Card className="!p-0">
-            <div className="h-[360px] overflow-hidden rounded-[28px]">
+            <div className="h-[280px] overflow-hidden rounded-[28px] sm:h-[360px]">
               <iframe
                 title="The Bamboo Hut map"
                 src="https://www.google.com/maps?q=restaurant&output=embed"
@@ -842,7 +854,7 @@ export function ContactSection() {
             </div>
           </Card>
 
-          <Card className="p-6 sm:p-8">
+          <Card className="p-5 sm:p-8">
             <form
               className="grid gap-4"
               onSubmit={(event) => {
@@ -893,9 +905,9 @@ export function ContactSection() {
 export function Footer() {
   return (
     <footer className="border-t border-white/10 bg-[#090909]">
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[1fr_auto_auto] lg:px-8">
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:grid-cols-2 sm:px-6 lg:grid-cols-[1fr_auto_auto] lg:px-8 2xl:max-w-[88rem] 2xl:px-10">
         <div>
-          <div className="font-heading text-3xl text-warm">{brand.name}</div>
+          <div className="font-heading text-2xl text-warm sm:text-3xl">{brand.name}</div>
           <p className="mt-4 max-w-xl text-sm leading-7 text-white/62">
             A premium restaurant website concept built to inspire online orders, reservation requests, and a lasting
             luxury dining identity.

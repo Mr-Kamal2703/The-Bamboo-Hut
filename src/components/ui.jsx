@@ -1,4 +1,4 @@
-import { motion, useScroll, useSpring } from "framer-motion";
+import { motion, useReducedMotion, useScroll, useSpring } from "framer-motion";
 import { useEffect, useState } from "react";
 import { FaArrowUp, FaStar } from "react-icons/fa6";
 
@@ -14,9 +14,9 @@ const reveal = {
 
 export function SectionShell({ children, id, className = "" }) {
   return (
-    <section id={id} className={`relative overflow-hidden py-20 sm:py-24 ${className}`}>
+    <section id={id} className={`relative overflow-hidden py-16 sm:py-20 lg:py-24 scroll-mt-28 sm:scroll-mt-32 ${className}`}>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(212,175,55,0.08),_transparent_38%)]" />
-      <div className="relative mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">{children}</div>
+      <div className="relative mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 2xl:max-w-[88rem] 2xl:px-10">{children}</div>
     </section>
   );
 }
@@ -33,30 +33,31 @@ export function SectionHeading({ eyebrow, title, description, align = "left" }) 
       <p className="mb-3 text-xs font-semibold uppercase tracking-[0.38em] text-gold/80">
         {eyebrow}
       </p>
-      <h2 className="font-heading text-4xl leading-tight text-warm sm:text-5xl lg:text-6xl">
+      <h2 className="font-heading text-2xl leading-tight text-warm sm:text-4xl lg:text-6xl">
         {title}
       </h2>
       {description ? (
-        <p className="mt-5 text-base leading-8 text-white/70 sm:text-lg">{description}</p>
+        <p className="mt-5 text-sm leading-7 text-white/70 sm:text-base sm:leading-8">{description}</p>
       ) : null}
     </motion.div>
   );
 }
 
 export function GlassButton({ children, href, onClick, type = "button", variant = "primary", className = "" }) {
+  const prefersReducedMotion = useReducedMotion();
   const base =
-    "inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold tracking-wide transition duration-300";
+    "inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold tracking-wide transition duration-300 touch-manipulation sm:w-auto";
   const styles =
     variant === "primary"
       ? "bg-gradient-to-r from-gold via-[#f4d47b] to-copper text-black shadow-glow hover:-translate-y-0.5 hover:shadow-[0_0_40px_rgba(212,175,55,0.45)]"
       : "border border-white/15 bg-white/5 text-warm backdrop-blur-md hover:border-gold/50 hover:bg-gold/10 hover:text-gold";
+  const hoverProps = prefersReducedMotion ? {} : { whileHover: { scale: 1.02 }, whileTap: { scale: 0.98 } };
 
   if (href) {
     return (
       <motion.a
         href={href}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
+        {...hoverProps}
         className={`${base} ${styles} ${className}`}
       >
         {children}
@@ -68,8 +69,7 @@ export function GlassButton({ children, href, onClick, type = "button", variant 
       <motion.button
       type={type}
       onClick={onClick}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
+      {...hoverProps}
       className={`${base} ${styles} ${className}`}
     >
       {children}
@@ -98,11 +98,12 @@ export function Badge({ children }) {
 }
 
 export function Card({ children, className = "" }) {
+  const prefersReducedMotion = useReducedMotion();
   return (
     <motion.div
       variants={reveal}
-      whileHover={{ y: -6 }}
-      className={`group relative overflow-hidden rounded-[28px] border border-white/10 bg-white/5 p-5 shadow-soft backdrop-blur-xl ${className}`}
+      whileHover={prefersReducedMotion ? undefined : { y: -6 }}
+      className={`group relative overflow-hidden rounded-[28px] border border-white/10 bg-white/5 p-4 shadow-soft backdrop-blur-xl sm:p-5 ${className}`}
     >
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(212,175,55,0.11),transparent_35%,transparent_65%,rgba(201,123,54,0.08))] opacity-0 transition duration-500 group-hover:opacity-100" />
       <div className="relative">{children}</div>
@@ -153,6 +154,7 @@ export function ScrollProgress() {
 
 export function BackToTop() {
   const [visible, setVisible] = useState(false);
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     const onScroll = () => setVisible(window.scrollY > 700);
@@ -169,8 +171,8 @@ export function BackToTop() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0 }}
-      whileHover={{ y: -4 }}
-      className="fixed bottom-5 right-5 z-40 rounded-full border border-white/10 bg-black/70 p-4 text-warm shadow-soft backdrop-blur-md transition hover:border-gold/40 hover:text-gold"
+      whileHover={prefersReducedMotion ? undefined : { y: -4 }}
+      className="fixed bottom-4 right-4 z-40 rounded-full border border-white/10 bg-black/70 p-3 text-warm shadow-soft backdrop-blur-md transition hover:border-gold/40 hover:text-gold sm:bottom-5 sm:right-5 sm:p-4"
       aria-label="Back to top"
     >
       <FaArrowUp />
